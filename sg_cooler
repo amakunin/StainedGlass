@@ -1,0 +1,68 @@
+set -e 
+
+THREADS=1
+PARAMS=""
+WINDOW=32
+COOLER_WINDOW=100
+
+while getopts ":t:p:" opt; do
+  case $opt in
+    t)
+      THREADS="$OPTARG"
+      echo "Using $THREADS threads" >&2
+      ;;
+    p)
+      PARAMS="$OPTARG"
+      echo "Using snakemake paramers: $PARAMS" >&2
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+  esac
+
+  case $OPTARG in
+    -*) echo "Option $opt needs a valid argument"
+    exit 1
+    ;;
+  esac
+done
+
+REF=${@:$OPTIND:1}
+
+echo "Generating cooler for $REF"
+
+FNAME=$(basename $REF)
+SAMPLE=${FNAME%.*}
+
+echo "Using sample name $SAMPLE"
+
+WD=$(dirname $REF)
+
+echo "Using working directory $WD"
+
+SD=$(dirname "$0")
+
+echo "Using snakemake directory $SD"
+# RESULTS_DIR="$WD/results"
+# TEMP_DIR="$WD/temp"
+
+# echo "Writing results to $RESULTS_DIR"
+# echo "Writing temp files to $TEMP_DIR"
+
+FAI="${REF}.fai"
+
+if [ -f $FAI ]; then
+  echo "FASTA index exists at $FAI"
+else
+  echo "Indexing $REF"
+  samtools faidx $REF
+fi
+
+snakemake --snakefile $SD/workflow/Snakefile \
+  --configfile $SD/config/config.yaml \
+  -d $WD \
+  $PARAMS --cores $THREADS cooler_density \
+	--config nbatch=1 alnthreads=$THREADS \
+	window=$WINDOW cooler_window=$COOLER_WINDOW \
+	fasta=$REF sample=$SAMPLE 
