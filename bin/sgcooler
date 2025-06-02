@@ -15,8 +15,12 @@ while getopts ":t:p:" opt; do
       PARAMS="$OPTARG"
       echo "Using snakemake paramers: $PARAMS" >&2
       ;;
+    h)
+      echo "Usage: sgcooler [-t] [-p] genome.fa" >&2
+      exit 0
+      ;;
     \?)
-      echo "Invalid option: -$OPTARG" >&2
+      echo "Invalid argument. Usage: sgcooler [-t] [-p] genome.fa" >&2
       exit 1
       ;;
   esac
@@ -29,6 +33,16 @@ while getopts ":t:p:" opt; do
 done
 
 REF=${@:$OPTIND:1}
+
+if [[ -z "$REF" ]]; then
+  echo "No input genome specified. Usage: sgcooler [-t] [-p] genome.fa" >&2
+  exit 1
+fi
+
+if [ ! -f "$REF" ]; then
+  echo "Input file not found: $REF"
+  exit 1
+fi
 
 echo "Generating cooler for $REF"
 

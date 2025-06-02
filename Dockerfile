@@ -12,4 +12,4 @@ RUN conda env update --name base --file /StainedGlass/workflow/envs/env.yaml --p
 
 # Step 4: add to path
 
-ENV PATH="/StainedGlass:$PATH"
+ENV PATH="/StainedGlass/bin/:$PATH"
