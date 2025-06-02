@@ -32,7 +32,8 @@ while getopts ":t:p:" opt; do
   esac
 done
 
-REF=${@:$OPTIND:1}
+shift "$((OPTIND-1))"
+REF=$1
 
 if [[ -z "$REF" ]]; then
   echo "No input genome specified. Usage: sgcooler [-t] [-p] genome.fa" >&2
@@ -73,8 +74,8 @@ else
   samtools faidx $REF
 fi
 
-snakemake --snakefile $SD/workflow/Snakefile \
-  --configfile $SD/config/config.yaml \
+snakemake --snakefile $SD/../workflow/Snakefile \
+  --configfile $SD/../config/config.yaml \
   -d $WD \
   $PARAMS --cores $THREADS cooler_density \
 	--config nbatch=1 alnthreads=$THREADS \
