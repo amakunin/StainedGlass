@@ -1,4 +1,6 @@
 FROM condaforge/miniforge3:24.7.1-2
+LABEL maintainer=am60@sanger.ac.uk
+LABEL org.opencontainers.image.licenses="MIT"
 
 # Step 2: Retrieve code
 
@@ -13,3 +15,4 @@ RUN conda env update --name base --file /StainedGlass/workflow/envs/env.yaml --p
 # Step 4: add to path
 
 ENV PATH="/StainedGlass/bin/:$PATH"
+RUN chmod +x /StainedGlass/bin/sgcooler
